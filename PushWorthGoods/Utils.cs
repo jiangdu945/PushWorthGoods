@@ -12,6 +12,8 @@ namespace PushWorthGoods
     /// </summary>
     public class Utils
     {
+        #region UnicodeConvert
+
         /// <summary>
         /// 字符串转Unicode
         /// </summary>
@@ -39,6 +41,30 @@ namespace PushWorthGoods
                 .Replace(unicode, x => Convert.ToChar(Convert.ToUInt16(x.Result("$1"), 16)).ToString());
         }
 
+        #endregion
 
+
+        #region Encode
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        /// <param name="str"></param>
+        public static string UrlEncode(string str)
+        {
+            return System.Web.HttpUtility.UrlEncode(str);
+        }
+
+        /// <summary>
+        /// 解码
+        /// </summary>
+        /// <param name="encode"></param>
+        /// <returns></returns>
+        public static string UrlDecode(string encode)
+        {
+            return System.Web.HttpUtility.UrlDecode(encode);
+        }
+
+        #endregion
     }
 }

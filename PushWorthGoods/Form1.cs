@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,6 +13,8 @@ namespace PushWorthGoods
 {
     public partial class Form1 : Form
     {
+        CookieContainer cookie = new CookieContainer();
+
         public Form1()
         {
             InitializeComponent();
@@ -19,11 +22,28 @@ namespace PushWorthGoods
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string searchlink = "http://search.smzdm.com/?s=%E5%89%8D%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8";
+            string html1 = HttpHelper.GetRequest("", "https://www.smzdm.com/", ref cookie, Encoding.UTF8);
 
 
+            string html2 = HttpHelper.GetRequest("", "http://search.smzdm.com", ref cookie, Encoding.UTF8);
+
+            string searchWord = Utils.UrlEncode("前置过滤器");
+            int page = 1;
+            string searchlink = $"http://search.smzdm.com/?c=home&s={searchWord}&p={page}";
+            string html = HttpHelper.GetRequest("", searchlink, ref cookie);
 
 
+            Func<CookieContainer, CookieContainer, int, bool> func
+                = delegate (CookieContainer homeCookie, CookieContainer htmlCookie, int completedCount)
+            {
+                cookie = homeCookie;
+
+                var coo=HttpHelper.GetCookies(homeCookie);
+
+                return false;
+            };
+            WebBrowserHelper webBrowser = new WebBrowserHelper();
+            webBrowser.LoadHtml("https://www.smzdm.com/", func, cookie);
 
 
 
@@ -38,8 +58,48 @@ namespace PushWorthGoods
             };
 
 
-            DingDingRobot dingDingRobot = new DingDingRobot();
-            dingDingRobot.Send(feedCardChilds);
+            //发送钉钉推送消息
+            //DingDingRobot dingDingRobot = new DingDingRobot();
+            //dingDingRobot.Send(feedCardChilds);
+        }
+
+
+        /// <summary>
+        /// 页面加载完事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Web_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            ((WebBrowser)sender).Document.Window.Error += new HtmlElementErrorEventHandler(Window_Error);
+
+            string webUrl = ((WebBrowser)sender).Url.AbsoluteUri;
+
+            this.textBox1.Text = webUrl;
+
+            this.richTextBox1.Text = ((WebBrowser)sender).DocumentText;
+        }
+
+
+        /// <summary>
+        /// 禁止弹窗提示错误
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Error(object sender, HtmlElementErrorEventArgs e)
+        {
+            // Ignore the error and suppress the error dialog box. 
+            e.Handled = true;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.webBrowser1.DocumentCompleted += Web_DocumentCompleted;
+            this.webBrowser1.Navigate(this.textBox1.Text);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
         }
     }
 }
