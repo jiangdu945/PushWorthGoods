@@ -89,4 +89,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Reactor_Deploy="0" Reactor_Output="&lt;AssemblyLocation&gt;\&lt;AssemblyFileName&gt;" Reactor_Configuration="Release" Reactor_Project="" Reactor_Commands="-compression 1 -antitamp 1 -control_flow_obfuscation 1 -flow_level 9  -obfuscate_public_types 1  -shownagscreen 1" Reactor_Enabled="0" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

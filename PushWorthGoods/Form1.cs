@@ -13,7 +13,8 @@ namespace PushWorthGoods
 {
     public partial class Form1 : Form
     {
-        CookieContainer cookie = new CookieContainer();
+        CookieContainer homecookie = new CookieContainer();
+        CookieContainer searchcookie = new CookieContainer();
 
         public Form1()
         {
@@ -22,28 +23,46 @@ namespace PushWorthGoods
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string html1 = HttpHelper.GetRequest("", "https://www.smzdm.com/", ref cookie, Encoding.UTF8);
+            string html1 = HttpHelper.GetRequest("", "https://www.smzdm.com/", ref homecookie, Encoding.UTF8);
 
 
-            string html2 = HttpHelper.GetRequest("", "http://search.smzdm.com", ref cookie, Encoding.UTF8);
+            string html2 = HttpHelper.GetRequest("", "http://search.smzdm.com", ref homecookie, Encoding.UTF8);
 
             string searchWord = Utils.UrlEncode("前置过滤器");
             int page = 1;
             string searchlink = $"http://search.smzdm.com/?c=home&s={searchWord}&p={page}";
-            string html = HttpHelper.GetRequest("", searchlink, ref cookie);
+            string html = HttpHelper.GetRequest("", searchlink, ref homecookie);
 
-
+            //主页访问
             Func<CookieContainer, CookieContainer, int, bool> func
                 = delegate (CookieContainer homeCookie, CookieContainer htmlCookie, int completedCount)
             {
-                cookie = homeCookie;
+                homecookie = homeCookie;
 
-                var coo=HttpHelper.GetCookies(homeCookie);
+                var homecks = HttpHelper.GetCookies(homeCookie);
+                var homeck = homecks.FirstOrDefault(p => p.Name == "amvid");
+
+                if (homeck != null)
+                {
+                    //查询页访问
+                    Func<CookieContainer, CookieContainer, int, bool> searchfunc
+                        = delegate (CookieContainer shomeCookie, CookieContainer shtmlCookie, int scompletedCount)
+                    {
+                        searchcookie = shomeCookie;
+
+                        var shomecks = HttpHelper.GetCookies(searchcookie);
+
+                        return false;
+                    };
+
+                    WebBrowserHelper searchWeb = new WebBrowserHelper();
+                    searchWeb.LoadHtml("https://search.smzdm.com/", searchfunc, searchcookie, homecookie);
+                }
 
                 return false;
             };
             WebBrowserHelper webBrowser = new WebBrowserHelper();
-            webBrowser.LoadHtml("https://www.smzdm.com/", func, cookie);
+            webBrowser.LoadHtml("https://www.smzdm.com/", func, homecookie);
 
 
 

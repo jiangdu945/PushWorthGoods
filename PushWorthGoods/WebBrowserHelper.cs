@@ -94,14 +94,14 @@ namespace PushWorthGoods
                 string value = cookieStr.Substring(beginIndex + 1, cookieStr.Length - beginIndex - 1);
                 string domain = ((WebBrowser)sender).Document.Domain;
 
-                if (_htmlCookie != null)
-                {
-                    HttpHelper.AddCookie(ref _htmlCookie, name, value, domain);
-                }
-                else
-                {
+                //if (_htmlCookie != null)
+                //{
+                //    HttpHelper.AddCookie(ref _htmlCookie, name, value, domain);
+                //}
+                //else
+                //{
                     HttpHelper.AddCookie(ref _loadCookie, name, value, domain);
-                }
+                //}
             }
             //判定是否全部完成
             bool isAllCompleted = _func(_loadCookie, _htmlCookie, _completedCount);

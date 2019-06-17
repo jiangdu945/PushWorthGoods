@@ -274,8 +274,10 @@ namespace PushWorthGoods
                 SortedList lstCookieCol = (SortedList)pathList.GetType().InvokeMember("m_list",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField
                     | System.Reflection.BindingFlags.Instance, null, pathList, new object[] { });
+
                 foreach (CookieCollection colCookies in lstCookieCol.Values)
-                    foreach (Cookie c in colCookies) lstCookies.Add(c);
+                    foreach (Cookie c in colCookies)
+                        lstCookies.Add(c);
             }
             return lstCookies;
         }
@@ -367,7 +369,7 @@ namespace PushWorthGoods
                 {
                     //调整过期时间，避免Cookie无法添加到CookieContainer中
                     newc.Expires = DateTime.Now.AddYears(1);
-                    if (oldc.Name == newc.Name)
+                    if (oldc.Name == newc.Name && oldc.Domain == newc.Domain)
                     {
                         isSame = true;
                         break;
