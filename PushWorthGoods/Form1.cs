@@ -43,28 +43,13 @@ namespace PushWorthGoods
                 var homeck = homecks.FirstOrDefault(p => p.Name == "amvid");
 
                 if (homeck != null)
-                {
-                    //查询页访问
-                    Func<CookieContainer, CookieContainer, int, bool> searchfunc
-                        = delegate (CookieContainer shomeCookie, CookieContainer shtmlCookie, int scompletedCount)
-                    {
-                        searchcookie = shomeCookie;
-
-                        var shomecks = HttpHelper.GetCookies(searchcookie);
-
-                        return false;
-                    };
-
-                    WebBrowserHelper searchWeb = new WebBrowserHelper();
-                    searchWeb.LoadHtml("https://search.smzdm.com/", searchfunc, searchcookie, homecookie);
-                }
+                    return true;
 
                 return false;
             };
             WebBrowserHelper webBrowser = new WebBrowserHelper();
             webBrowser.LoadHtml("https://www.smzdm.com/", func, homecookie);
-
-
+            webBrowser.HTMLLoadCompleted += WebBrowser_HTMLLoadCompleted;
 
 
             List<FeedCardChilds> feedCardChilds = new List<FeedCardChilds>() {
@@ -81,6 +66,28 @@ namespace PushWorthGoods
             //DingDingRobot dingDingRobot = new DingDingRobot();
             //dingDingRobot.Send(feedCardChilds);
         }
+
+        private void WebBrowser_HTMLLoadCompleted()
+        {
+            //查询页访问
+            Func<CookieContainer, CookieContainer, int, bool> searchfunc
+                = delegate (CookieContainer shomeCookie, CookieContainer shtmlCookie, int scompletedCount)
+                {
+                    searchcookie = shomeCookie;
+
+                    var shomecks = HttpHelper.GetCookies(searchcookie);
+
+                    return false;
+                };
+
+            WebBrowserHelper searchWeb = new WebBrowserHelper();
+            searchWeb.LoadHtml("https://search.smzdm.com/", searchfunc, homecookie);
+
+
+        }
+
+
+
 
 
         /// <summary>

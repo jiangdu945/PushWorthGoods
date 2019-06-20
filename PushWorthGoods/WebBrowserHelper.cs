@@ -20,10 +20,19 @@ namespace PushWorthGoods
         WebBrowser webBrowser = new WebBrowser();
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="func"></param>
+        /// <param name="loadCookie"></param>
+        public delegate void HTMLLoadHandler();
+        public event HTMLLoadHandler HTMLLoadCompleted;
+
+        /// <summary>
         /// 加载Html页面
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="action">
+        /// <param name="func">
         ///     param:
         ///         CookieContainer-loadCookie;
         ///         CookieContainer-htmlCookie;
@@ -100,7 +109,7 @@ namespace PushWorthGoods
                 //}
                 //else
                 //{
-                    HttpHelper.AddCookie(ref _loadCookie, name, value, domain);
+                HttpHelper.AddCookie(ref _loadCookie, name, value, domain);
                 //}
             }
             //判定是否全部完成
@@ -112,6 +121,8 @@ namespace PushWorthGoods
                 _isloading = false;
                 webBrowser.DocumentCompleted -= WebBrowser_DocumentCompleted;
                 webBrowser.Document.Window.Error -= new HtmlElementErrorEventHandler(Window_Error);
+
+                HTMLLoadCompleted?.Invoke();
             }
         }
 
@@ -125,7 +136,6 @@ namespace PushWorthGoods
             // Ignore the error and suppress the error dialog box. 
             e.Handled = true;
         }
-
 
     }
 }
